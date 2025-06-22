@@ -108,4 +108,4 @@ Otters are playful, intelligent creatures that bring joy and positivity. This ex
 
 ---
 
-**Made with ❤️ by TonsOfFunn** 
+**Made with ❤️ and 🦦 by TonsOfFunn** 
