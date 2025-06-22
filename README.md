@@ -1,6 +1,6 @@
 # 🦦 Otter Todo Extension
 
-A beautiful, modern browser extension for managing your daily tasks with a playful otter theme!
+A modern browser extension for managing your daily tasks with a playful otter theme!
 
 ## ✨ Features
 
