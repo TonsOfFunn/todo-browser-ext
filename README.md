@@ -8,7 +8,7 @@ A beautiful, modern browser extension for managing your daily tasks with a playf
 - **Otter Theme**: Adorable otter emojis and playful design elements
 - **Auto-focus**: Input field automatically focuses when popup opens
 - **Keyboard Support**: Add tasks with Enter key for quick workflow
-- **Task Completion**: Green checkmark buttons to mark tasks as complete
+- **Task Completion**: Green checkmark buttons to close tasks as complete
 - **Local Storage**: Tasks persist between browser sessions
 - **Responsive Design**: Works perfectly on different screen sizes
 - **Security**: Input validation and XSS protection
@@ -108,4 +108,4 @@ Otters are playful, intelligent creatures that bring joy and positivity. This ex
 
 ---
 
-**Made with ❤️ and �� by [Your Name]** 
+**Made with ❤️ by TonsOfFunn** 
