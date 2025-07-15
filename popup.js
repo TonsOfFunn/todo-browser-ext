@@ -2,6 +2,10 @@ const taskInput = document.getElementById('taskInput');
 const addBtn = document.getElementById('addBtn');
 const taskList = document.getElementById('taskList');
 
+// Drag and drop state
+let draggedElement = null;
+let draggedIndex = -1;
+
 // Safe JSON parsing with error handling
 function safeJSONParse(jsonString, defaultValue = []) {
   try {
@@ -54,9 +58,19 @@ function loadTasks() {
     }
     
     const li = document.createElement('li');
+    li.draggable = true;
+    li.dataset.index = index;
+    
+    // Add drag handle
+    const dragHandle = document.createElement('span');
+    dragHandle.className = 'drag-handle';
+    dragHandle.innerHTML = '⋮⋮';
+    dragHandle.setAttribute('aria-label', 'Drag to reorder');
+    li.appendChild(dragHandle);
     
     // Create span for task text
     const taskSpan = document.createElement('span');
+    taskSpan.className = 'task-text';
     taskSpan.textContent = task;
     li.appendChild(taskSpan);
     
@@ -68,8 +82,79 @@ function loadTasks() {
     };
     
     li.appendChild(completeBtn);
+    
+    // Add drag and drop event listeners
+    li.addEventListener('dragstart', handleDragStart);
+    li.addEventListener('dragend', handleDragEnd);
+    li.addEventListener('dragover', handleDragOver);
+    li.addEventListener('drop', handleDrop);
+    li.addEventListener('dragenter', handleDragEnter);
+    li.addEventListener('dragleave', handleDragLeave);
+    
     taskList.appendChild(li);
   });
+}
+
+// Drag and drop event handlers
+function handleDragStart(e) {
+  draggedElement = this;
+  draggedIndex = parseInt(this.dataset.index);
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/html', this.outerHTML);
+}
+
+function handleDragEnd(e) {
+  this.classList.remove('dragging');
+  draggedElement = null;
+  draggedIndex = -1;
+  
+  // Remove drop zone indicators
+  document.querySelectorAll('.drag-over').forEach(el => {
+    el.classList.remove('drag-over');
+  });
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+
+function handleDragEnter(e) {
+  e.preventDefault();
+  this.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+  // Only remove class if we're leaving the element entirely
+  if (!this.contains(e.relatedTarget)) {
+    this.classList.remove('drag-over');
+  }
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  this.classList.remove('drag-over');
+  
+  if (draggedElement && draggedElement !== this) {
+    const dropIndex = parseInt(this.dataset.index);
+    
+    // Reorder tasks in localStorage
+    const tasks = safeJSONParse(localStorage.getItem('tasks'), []);
+    const movedTask = tasks[draggedIndex];
+    
+    // Remove from original position
+    tasks.splice(draggedIndex, 1);
+    
+    // Insert at new position
+    tasks.splice(dropIndex, 0, movedTask);
+    
+    // Save back to localStorage
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    
+    // Reload the list to reflect the new order
+    loadTasks();
+  }
 }
 
 // Function to add a new task

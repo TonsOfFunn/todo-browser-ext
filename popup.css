@@ -200,6 +200,47 @@ li {
   border: 1px solid rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(5px);
   animation: slideIn 0.3s ease-out;
+  cursor: grab;
+  user-select: none;
+}
+
+li:active {
+  cursor: grabbing;
+}
+
+/* Drag and drop styles */
+li.dragging {
+  opacity: 0.5;
+  transform: rotate(2deg) scale(1.02);
+  box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+  z-index: 1000;
+}
+
+li.drag-over {
+  border-color: rgba(78, 205, 196, 0.6);
+  background: rgba(78, 205, 196, 0.1);
+  transform: translateY(2px);
+}
+
+/* Drag handle */
+.drag-handle {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  cursor: grab;
+  padding: 2px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.drag-handle:hover {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+li:hover .drag-handle {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 @keyframes slideIn {
@@ -224,7 +265,7 @@ li:last-child {
 }
 
 /* Task Text */
-li span {
+.task-text {
   flex: 1;
   font-size: 14px;
   font-weight: 500;
