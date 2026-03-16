@@ -13,6 +13,8 @@ A modern browser extension for managing your daily tasks with a playful otter th
 - **Responsive Design**: Works perfectly on different screen sizes
 - **Security**: Input validation and XSS protection
 - **Accessibility**: Proper ARIA labels and keyboard navigation
+- **Drag & Drop Reordering**: Reorder tasks by dragging the handle on each item
+- **Inline Editing**: Double-click a task to edit it in place with validated, sanitized input
 
 ## 🎨 Design Highlights
 
