@@ -68,10 +68,15 @@ function loadTasks() {
     dragHandle.setAttribute('aria-label', 'Drag to reorder');
     li.appendChild(dragHandle);
     
-    // Create span for task text
+    // Create span for task text (double-click to edit)
     const taskSpan = document.createElement('span');
     taskSpan.className = 'task-text';
     taskSpan.textContent = task;
+    taskSpan.setAttribute('title', 'Double-click to edit');
+    taskSpan.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      startEditMode(li, taskSpan, index);
+    });
     li.appendChild(taskSpan);
     
     const completeBtn = document.createElement('button');
@@ -189,6 +194,84 @@ taskInput.addEventListener('keypress', (event) => {
     addTask();
   }
 });
+
+// Double-click to edit: replace task text with an input, save on blur/Enter, cancel on Escape
+const MAX_TASK_LENGTH = 1000;
+
+function startEditMode(li, taskSpan, index) {
+  // Only one item in edit mode at a time: end any existing edit
+  const existingEdit = taskList.querySelector('.task-edit-input');
+  if (existingEdit) {
+    existingEdit.blur();
+    return;
+  }
+
+  const originalText = taskSpan.textContent;
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'task-edit-input';
+  input.value = originalText;
+  input.maxLength = MAX_TASK_LENGTH;
+  input.setAttribute('aria-label', 'Edit task');
+
+  function exitEditMode(save) {
+    if (!input.parentNode) return; // Already exited
+    const newSpan = document.createElement('span');
+    newSpan.className = 'task-text';
+    newSpan.setAttribute('title', 'Double-click to edit');
+    if (save) {
+      const sanitized = validateAndSanitizeInput(input.value);
+      if (sanitized && sanitized !== originalText) {
+        try {
+          const tasks = safeJSONParse(localStorage.getItem('tasks'), []);
+          if (index >= 0 && index < tasks.length) {
+            tasks[index] = sanitized;
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            newSpan.textContent = sanitized;
+          } else {
+            newSpan.textContent = originalText;
+          }
+        } catch (err) {
+          console.error('Error updating task:', err);
+          newSpan.textContent = originalText;
+        }
+      } else {
+        newSpan.textContent = originalText;
+      }
+    } else {
+      newSpan.textContent = originalText;
+    }
+    newSpan.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      startEditMode(li, newSpan, index);
+    });
+    li.replaceChild(newSpan, input);
+    li.draggable = true;
+    input.removeEventListener('blur', onBlur);
+    input.removeEventListener('keydown', onKeyDown);
+  }
+
+  function onBlur() {
+    exitEditMode(true);
+  }
+
+  function onKeyDown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      input.blur(); // triggers onBlur which saves
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      exitEditMode(false);
+    }
+  }
+
+  input.addEventListener('blur', onBlur);
+  input.addEventListener('keydown', onKeyDown);
+  li.draggable = false;
+  li.replaceChild(input, taskSpan);
+  input.focus();
+  input.select();
+}
 
 // Complete a task by index (more reliable than by content)
 function completeTask(index) {
